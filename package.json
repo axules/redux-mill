@@ -1,6 +1,6 @@
 {
   "name": "react-redux-mill",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": {
     "name": "Shelest Denis",
     "email": "axules@gmail.com"
@@ -51,7 +51,7 @@
     "@babel/preset-env": "^7.8.3",
     "@babel/runtime-corejs3": "^7.8.3",
     "babel-eslint": "^10.0.3",
-    "babel-jest": "^24.9.0",
+    "babel-jest": "^25.1.0",
     "babel-loader": "^8.0.6",
     "core-js": "^3.6.4",
     "eslint": "^6.8.0",
@@ -59,8 +59,8 @@
     "eslint-plugin-babel": "^5.3.0",
     "eslint-plugin-flowtype": "^4.6.0",
     "eslint-plugin-import": "^2.20.0",
-    "jest": "^24.9.0",
-    "jest-runner-eslint": "^0.7.5"
+    "jest": "^25.1.0",
+    "jest-runner-eslint": "^0.7.6"
   },
   "files": [
     "dist",
