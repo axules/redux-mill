@@ -7,6 +7,7 @@
     - [As simple object](#reducer-is-simple-object)
     - [As instance of function](#reducer-is-instance-of-function)
     - [As instance of class](#reducer-is-instance-of-class)
+4. [Without and with comparison](#without-and-with-comparison)
 
 
 ## What is it?
@@ -430,3 +431,13 @@ reduxMill(`initialState`, `reducer`, `storeName`, `options`): function(selector:
   export const selectError = store(state => state.error);
 
 ```
+
+# Without and with comparison
+
+## Before => 64 lines / 4 actions constants / 7 action creators
+![Alt Text](./readme/react-redux-mill-before.png)
+
+## After => 47 lines / 1 action creators export
+![Alt Text](./readme/react-redux-mill-after.png)
+
+### External lib [`deep-mutation`](https://www.npmjs.com/package/deep-mutation) was used in examples, but it `IS NOT` required dependency.
