@@ -73,11 +73,7 @@ export default function(initialState, rules, name, config = {}) {
         }
         R[path] = value.bind(void 0);
       } else {
-        // Object.assign(R, getCases(value, makeType(path, divider, key)));
-        const childrenCases = getCases(value, makeType(path, divider, key));
-        Object.entries(childrenCases).forEach(([childKey, childValue]) => {
-          R[childKey] = childValue;
-        });
+        Object.assign(R, getCases(value, makeType(path, divider, key)));
       }
       return R;
     }, {});

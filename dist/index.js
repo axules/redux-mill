@@ -113,13 +113,7 @@ function _default(initialState, rules, name, config) {
 
         R[path] = value.bind(void 0);
       } else {
-        // Object.assign(R, getCases(value, makeType(path, divider, key)));
-        var childrenCases = getCases(value, makeType(path, divider, key));
-        Object.entries(childrenCases).forEach(function (_ref3) {
-          var childKey = _ref3[0],
-              childValue = _ref3[1];
-          R[childKey] = childValue;
-        });
+        Object.assign(R, getCases(value, makeType(path, divider, key)));
       }
 
       return R;
@@ -132,9 +126,9 @@ function _default(initialState, rules, name, config) {
       prefix = '';
     }
 
-    Object.entries(rules).forEach(function (_ref4) {
-      var key = _ref4[0],
-          value = _ref4[1];
+    Object.entries(rules).forEach(function (_ref3) {
+      var key = _ref3[0],
+          value = _ref3[1];
       var type = makeType(prefix, divider, key);
 
       rules[key] = function (payload) {
