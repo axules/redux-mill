@@ -1,4 +1,4 @@
-# react-redux-mill
+# redux-mill
 
 1. [What is it?](#what-is-it)
 1. [Reasons to use it](#you-should-try-it-if)
@@ -11,7 +11,7 @@
 
 
 ## What is it?
-`react-redux-mill` is the easy way to use redux by one object.
+`redux-mill` is the easy way to use redux by one object.
 Main idea is possibility to use only one object to use actions, action creators and store.
 
 ## You should try it if
@@ -23,16 +23,16 @@ Main idea is possibility to use only one object to use actions, action creators 
 ## Installation
 
 ```
-npm install --save react-redux-mill
+npm install --save redux-mill
 ```
 
-# Using
+## Using
 It is easy to understand but there are some details.
 
 #### Create your reducer
 ```javascript
   // myReducer.js
-  import reduxMill from 'react-redux-mill';
+  import reduxMill from 'redux-mill';
 
   const initialState = { title: 'Default title' };
 
@@ -126,11 +126,11 @@ It is easy to understand but there are some details.
   )(MyComp);
 ```
 
-## (!) `reducer` object will be changed after call of reduxMill
+### (!) `reducer` object will be changed after call of reduxMill
 It will be object with the same structure, but each value will be action creator function(payload).
 
 ```javascript
-  import reduxMill from 'react-redux-mill';
+  import reduxMill from 'redux-mill';
   const reducer = {
     EDIT_TITLE: (state, title) => ({ ...state, title }),
     SAVE: {
@@ -432,12 +432,12 @@ reduxMill(`initialState`, `reducer`, `storeName`, `options`): function(selector:
 
 ```
 
-# Without and with comparison
+## Without and with comparison
 
-## Before => 64 lines / 4 actions constants / 7 action creators
-![Alt Text](./readme/react-redux-mill-before.png)
+#### Before => 64 lines / 4 actions constants / 7 action creators
+![Alt Text](./readme/redux-mill-before.png)
 
-## After => 47 lines / 1 action creators export
-![Alt Text](./readme/react-redux-mill-after.png)
+#### After => 47 lines / 1 action creators export
+![Alt Text](./readme/redux-mill-after.png)
 
-### External lib [`deep-mutation`](https://www.npmjs.com/package/deep-mutation) was used in examples, but it `IS NOT` required dependency.
+#### External lib [`deep-mutation`](https://www.npmjs.com/package/deep-mutation) was used in examples, but it `IS NOT` required dependency.

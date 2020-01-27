@@ -1,12 +1,12 @@
 {
-  "name": "react-redux-mill",
-  "version": "1.0.1",
+  "name": "redux-mill",
+  "version": "1.0.2",
   "author": {
     "name": "Shelest Denis",
     "email": "axules@gmail.com"
   },
   "bugs": {
-    "url": "https://github.com/axules/react-redux-mill/issues"
+    "url": "https://github.com/axules/redux-mill/issues"
   },
   "contributors": [
     {
@@ -19,17 +19,18 @@
   "description": "The mutate method returns new object with changes",
   "keywords": [
     "react redux",
-    "redux tools",
-    "tools",
     "redux",
+    "redux tools",
     "redux starter kit",
     "redux helper",
-    "helper"
+    "helper",
+    "tools",
+    "starter kit"
   ],
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/axules/react-redux-mill.git"
+    "url": "https://github.com/axules/redux-mill.git"
   },
   "scripts": {
     "prepack": "npm run build",
