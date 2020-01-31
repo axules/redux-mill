@@ -101,7 +101,7 @@ export default function(initialState, rules, name, config = {}) {
         return type;
       };
 
-      rules[key].toValue = function toValue() {
+      rules[key].valueOf = function valueOf() {
         return type;
       };
     });

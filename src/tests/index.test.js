@@ -159,13 +159,16 @@ describe('reduxMill', () => {
       reduxMill(initState, reducer, 'myName', { });
       expect(reducer.GET.toString()).toBe('GET');
       expect(reducer.GET.LOAD.toString()).toBe('GET_LOAD');
+      expect(String(reducer.GET)).toBe('GET');
+      expect(String(reducer.GET.LOAD)).toBe('GET_LOAD');
     });
 
     it('should contain action creators that can be converted to value', () => {
       reduxMill(initState, reducer, 'myName', { });
-      expect(reducer.GET.toValue()).toBe('GET');
-      expect(reducer.GET.LOAD.toValue()).toBe('GET_LOAD');
-
+      expect(reducer.GET.valueOf()).toBe('GET');
+      expect(reducer.GET.LOAD.valueOf()).toBe('GET_LOAD');
+      expect(reducer.GET + '!').toBe('GET!');
+      expect(reducer.GET.LOAD + '!').toBe('GET_LOAD!');
       expect(reducer.GET == 'GET').toBeTruthy();
       expect(reducer.GET.LOAD == 'GET_LOAD').toBeTruthy();
     });
@@ -187,7 +190,7 @@ describe('reduxMill', () => {
       const type = 'GET_LOAD';
       expect(reducer.GET.LOAD._).toBe(type);
       expect(reducer.GET.LOAD.toString()).toBe(type);
-      expect(reducer.GET.LOAD.toValue()).toBe(type);
+      expect(reducer.GET.LOAD.valueOf()).toBe(type);
     });
 
     it('> AC should return object with type and payload', () => {
