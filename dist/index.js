@@ -69,7 +69,14 @@ function consoleDebugLog() {
  * @param {Object} initialState - default state
  * @param {Object} rules - Your reducer. Object or instance of class
  * @param {String} name - it is name for redux store
- * @param {Object} config - additional options { debug, stateDebug, divider, mainKey }
+ * @param {Object} config - additional options {
+ *  debug: Bool, default is false,
+ *  stateDebug: Bool, default is false,
+ *  divider: String, default is '_',
+ *  mainKey: String or Number, default is 0,
+ *  reducerWrapper: Function(initState, Function(state, action)):Function(state, action),
+ *  actionWrapper: Function(Function(state, payload, action)):Function(state, payload, action)
+ * }
  * @returns {Object} - function(selector: function(store, ...args))
  */
 
@@ -85,23 +92,42 @@ function _default(initialState, rules, name, config) {
       debug = _defaultConfig$config.debug,
       divider = _defaultConfig$config.divider,
       stateDebug = _defaultConfig$config.stateDebug,
-      mainKey = _defaultConfig$config.mainKey;
+      mainKey = _defaultConfig$config.mainKey,
+      reducerWrapper = _defaultConfig$config.reducerWrapper,
+      actionWrapper = _defaultConfig$config.actionWrapper;
 
   var debugLog = debug ? consoleDebugLog : function () {
     return null;
-  }; // ----------------------------------------------------------
+  };
+  if (reducerWrapper && !isFunction(reducerWrapper)) throw new Error('reducerWrapper should be Function');
+  if (actionWrapper && !isFunction(actionWrapper)) throw new Error('actionWrapper should be Function');
+
+  function prepareAction(action) {
+    var wrapped = actionWrapper ? actionWrapper(action.bind(void 0)) : action.bind(void 0);
+
+    if (actionWrapper && !isFunction(wrapped)) {
+      throw new Error('actionWrapper should return Function(state, action)');
+    }
+
+    return wrapped;
+  } // ----------------------------------------------------------
   // returns all of cases for rules-reducer
 
-  function getCases(rules, path) {
-    var _ref;
 
+  function getCases(rules, path) {
     if (path === void 0) {
       path = '';
     }
 
     checkAllowedType(rules);
     if (!rules) return {};
-    if (isFunction(rules)) return _ref = {}, _ref[path] = rules.bind(void 0), _ref;
+
+    if (isFunction(rules)) {
+      var _ref;
+
+      return _ref = {}, _ref[path] = prepareAction(rules), _ref;
+    }
+
     return Object.entries(rules).reduce(function (R, _ref2) {
       var key = _ref2[0],
           value = _ref2[1];
@@ -111,7 +137,7 @@ function _default(initialState, rules, name, config) {
           throw new Error("[" + path + "." + key + "] should be function. Because it is [" + path + "] reducer's base handler");
         }
 
-        R[path] = value.bind(void 0);
+        R[path] = prepareAction(value);
       } else {
         Object.assign(R, getCases(value, makeType(path, divider, key)));
       }
@@ -193,6 +219,16 @@ function _default(initialState, rules, name, config) {
     return state;
   };
 
+  if (reducerWrapper) {
+    debugLog('Reducer will be wrapped into reducerWrapper', cases);
+  }
+
+  var wrappedReducer = reducerWrapper ? reducerWrapper(initialState, reducer) : reducer;
+
+  if (!isFunction(wrappedReducer)) {
+    throw new Error('reducerWrapper should return Function(state, action)');
+  }
+
   var customSelector = function customSelector(selector) {
     return function (state) {
       for (var _len2 = arguments.length, args = new Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
@@ -203,6 +239,6 @@ function _default(initialState, rules, name, config) {
     };
   };
 
-  customSelector[name] = reducer;
+  customSelector[name] = wrappedReducer;
   return customSelector;
 }

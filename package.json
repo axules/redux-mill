@@ -1,6 +1,6 @@
 {
   "name": "redux-mill",
-  "version": "1.0.3",
+  "version": "1.1.1",
   "author": {
     "name": "Shelest Denis",
     "email": "axules@gmail.com"
@@ -16,7 +16,7 @@
   ],
   "main": "./dist/index.js",
   "deprecated": false,
-  "description": "The mutate method returns new object with changes",
+  "description": "It is the easy way to use redux by one object",
   "keywords": [
     "react redux",
     "redux",

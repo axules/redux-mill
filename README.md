@@ -1,13 +1,19 @@
 # redux-mill
 
 1. [What is it?](#what-is-it)
-1. [Reasons to use it](#you-should-try-it-if)
-2. [Installation](#installation)
-3. [Using](#Using)
+2. [Reasons to use it](#you-should-try-it-if)
+3. [Installation](#installation)
+4. [Using](#Using)
+    - [config.reducerWrapper](#use-with-reducerWrapper)
+    - [config.actionWrapper](#use-with-actionWrapper)
     - [As simple object](#reducer-is-simple-object)
     - [As instance of function](#reducer-is-instance-of-function)
     - [As instance of class](#reducer-is-instance-of-class)
-4. [Without and with comparison](#without-and-with-comparison)
+5. [Without and with comparison](#without-and-with-comparison)
+6. [Tests](./src/tests)
+    - [redux-mill](./src/tests/index.test.js)
+    - [config.reducerWrapper](./src/tests/reducerWrapper.test.js)
+    - [config.actionWrapper](./src/tests/actionWrapper.test.js)
 
 
 ## What is it?
@@ -38,13 +44,14 @@ It is easy to understand but there are some details.
 
   const reducer = {
     EDIT_TITLE: (state, title) => ({ ...state, title }),
+    // ACTION_TYPE: (state, payload, action) => ({ ...state, ...}),
     SAVE: {
       // it is for SAVE action
       0: state => ({ state, saving: true, error: "" }),
       // it is for SAVE__END action
-      END: (state, payload) => ({ ...state, saving: false }),
+      END: (state, payload, action) => ({ ...state, saving: false }),
        // it is for SAVE__FAIL action
-      FAIL: (state, payload) => ({ ...state, saving: false, error: payload.error })
+      FAIL: (state, payload, action) => ({ ...state, saving: false, error: payload.error })
     }
     // ...
   };
@@ -131,6 +138,7 @@ It will be object with the same structure, but each value will be action creator
 
 ```javascript
   import reduxMill from 'redux-mill';
+
   const reducer = {
     EDIT_TITLE: (state, title) => ({ ...state, title }),
     SAVE: {
@@ -143,10 +151,10 @@ It will be object with the same structure, but each value will be action creator
     initialState,
     reducer,
     'myStoreName',
-    { divider: "__" }
+    { divider: "__" },
   );
 
-  // what will be in reducer object after reduxMill calling
+  // what will be in `reducer` object after reduxMill calling
   {
     EDIT_TITLE: function(payload) {
       this._ = 'EDIT_TITLE';
@@ -221,18 +229,99 @@ reduxMill(`initialState`, `reducer`, `storeName`, `options`): function(selector:
 | `stateDebug` | Boolean | false | enable debug state changes console logging |
 | `divider` | String | '_' | it is divider between parent key and children subkey |
 | `mainKey` | String | 0 | it is key for main handler for parent action name |
+| `reducerWrapper` | Function(initState, Function) |  | It is function wrapper for your reducer (e.g. immer) |
+| `actionWrapper` | Function(Function) |  | It is function wrapper for each action |
 
 #### It returns function that is factory of selectors for REDUX[storeName]
 
 ```javascript
   const store = reduxMill(initialState, reducer, 'storeName');
   const selectItem = store((state, id) => state.items[id]);
-  // it return function(state[, ...args])
+  // it returns function(state, id)
   const selectItem2 = (state, id) => state['storeName'].items[id];
   // selectItem the same that selectItem2
   // state['storeName'] - is our current store
   // ...
 ```
+
+### Use with `reducerWrapper`
+If you want to wrap your reducer, then you should use `reducerWrapper`. When we make reducer function we will wrap it into `reducerWrapper(initialState, reducerFunction)`.
+`reducerWrapper` should return `Function(state, action)`.
+
+```javascript
+  import reduxMill from 'redux-mill';
+
+  function wrapReducer(baseState, callback) {
+    // calback - it is reducer function(state, action), returns state
+    console.log('your reudcer was wrapped', baseState, callback);
+    return (state = baseState, action) => {
+      console.log('reducer called with action: ', action);
+      console.log('we will generate new state each time!');
+      // don't repeat this trick with JSON.parse(JSON.stringfy(...))
+      // it will be applied for any result of reducer
+      // and for current state if this reducer doesn't contain required action
+      return JSON.parse(JSON.stringfy(callback(state, action)));
+    }
+  }
+
+  const initialState = {
+    title: '',
+    items: [
+      { note: '11111' },
+    ]
+  }
+
+  const reducer = {
+    setTitle: (draft, payload) => { draft.title = payload }
+    setNote: (draft, payload) => { draft.items[0].note = payload }
+  }
+
+  const store = reduxMill(initialState, reducer, 'storeName', { reducerWrapper: wrapReducer });
+```
+
+[Test cases for `reducerWrapper`](./src/tests/reducerWrapper.test.js)
+
+
+### Use with `actionWrapper`
+If you want to wrap each action handler separately then you should use `actionWrapper`. Each action handler will be wrapped into `actionWrapper(actionHandler)`. We expect that `actionHandler` is Function(state, action). `actionWrapper` should return `Function(state, [payload, action])`.
+
+```javascript
+  import reduxMill from 'redux-mill';
+
+  function wrapAction(callback) {
+    // calback - it is action function(state, payload, action), returns state
+    console.log('your action handler was wrapped', callback);
+    return (state, payload, action) => {
+      console.log('Action was called: ', action.type);
+      console.log('we will generate new state');
+      // I don't recomend to use this trick with JSON.parse(JSON.stringfy(...))
+      // But you can, because it will be called only for actions, not for default
+      return JSON.parse(JSON.stringfy(callback(state, payload, action)));
+    }
+  }
+
+  const initialState = {
+    title: '',
+    items: [
+      { note: '11111' },
+    ]
+  }
+
+  const reducer = {
+    setTitle: (draft, payload) => { draft.title = payload },
+    setNote: (draft, payload) => { draft.items[0].note = payload }
+  }
+
+  const store = reduxMill(initialState, reducer, 'storeName', { actionWrapper: wrapAction });
+
+  // if you wont to use actionWrapper, then you should wrap each handler by your self, it is the same
+  // const reducer = {
+  //   setTitle: produceAction((draft, { payload }) => { draft.title = payload }),
+  //   setNote: produceAction((draft, { payload }) => { draft.items[0].note = payload })
+  // }
+```
+
+[Test cases for `actionWrapper`](./src/tests/actionWrapper.test.js)
 
 ## `reducer` is simple object
 
