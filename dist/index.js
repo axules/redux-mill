@@ -88,7 +88,7 @@ function _default(initialState, rules, name, config) {
 
   if (typeof rules !== 'object') throw new Error('Reducer should be Object');
 
-  var _defaultConfig$config = Object.assign({}, defaultConfig, {}, config),
+  var _defaultConfig$config = Object.assign({}, defaultConfig, config),
       debug = _defaultConfig$config.debug,
       divider = _defaultConfig$config.divider,
       stateDebug = _defaultConfig$config.stateDebug,
@@ -172,6 +172,7 @@ function _default(initialState, rules, name, config) {
       }
 
       rules[key]._ = type;
+      rules[key].type = type;
 
       rules[key].toString = function toString() {
         return type;

@@ -1,6 +1,6 @@
 {
   "name": "redux-mill",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "author": {
     "name": "Shelest Denis",
     "email": "axules@gmail.com"
@@ -46,22 +46,22 @@
     ]
   },
   "devDependencies": {
-    "@babel/cli": "^7.8.3",
-    "@babel/core": "^7.8.3",
-    "@babel/node": "^7.8.3",
-    "@babel/preset-env": "^7.8.3",
-    "@babel/runtime-corejs3": "^7.8.3",
-    "babel-eslint": "^10.0.3",
-    "babel-jest": "^25.1.0",
-    "babel-loader": "^8.0.6",
-    "core-js": "^3.6.4",
+    "@babel/cli": "^7.11.6",
+    "@babel/core": "^7.11.6",
+    "@babel/node": "^7.10.5",
+    "@babel/preset-env": "^7.11.5",
+    "@babel/runtime-corejs3": "^7.11.2",
+    "babel-eslint": "^10.1.0",
+    "babel-jest": "^25.5.1",
+    "babel-loader": "^8.1.0",
+    "core-js": "^3.6.5",
     "eslint": "^6.8.0",
-    "eslint-loader": "^3.0.3",
-    "eslint-plugin-babel": "^5.3.0",
-    "eslint-plugin-flowtype": "^4.6.0",
-    "eslint-plugin-import": "^2.20.0",
-    "jest": "^25.1.0",
-    "jest-runner-eslint": "^0.7.6"
+    "eslint-loader": "^3.0.4",
+    "eslint-plugin-babel": "^5.3.1",
+    "eslint-plugin-flowtype": "^4.7.0",
+    "eslint-plugin-import": "^2.22.0",
+    "jest": "^25.5.4",
+    "jest-runner-eslint": "^0.7.7"
   },
   "files": [
     "dist",
