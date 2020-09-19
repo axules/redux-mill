@@ -158,6 +158,7 @@ It will be object with the same structure, but each value will be action creator
   {
     EDIT_TITLE: function(payload) {
       this._ = 'EDIT_TITLE';
+      this.type = 'EDIT_TITLE';
       this.toString = function() { return 'EDIT_TITLE' };
       this.valueOf = function() { return 'EDIT_TITLE' };
       return { type: 'EDIT_TITLE': payload };
@@ -165,17 +166,20 @@ It will be object with the same structure, but each value will be action creator
     SAVE: function(payload) {
       this.END = function(payload) {
         this._ = 'SAVE__END';
+        this.type = 'SAVE__END';
         this.toString = function() { return 'SAVE__END' };
         this.valueOf = function() { return 'SAVE__END' };
         return { type: 'SAVE__END': payload };
       },
       this.FAIL = function(payload) {
         this._ = 'SAVE__FAIL';
+        this.type = 'SAVE__FAIL';
         this.toString = function() { return 'SAVE__FAIL' };
         this.valueOf = function() { return 'SAVE__FAIL' };
         return { type: 'SAVE__FAIL': payload };
       },
       this._ = 'SAVE';
+      this.type = 'SAVE';
       this.toString = function() { return 'SAVE' };
       this.valueOf = function() { return 'SAVE' };
       return { type: 'SAVE': payload };
@@ -190,6 +194,8 @@ It will be object with the same structure, but each value will be action creator
   // console:> false
 
   console.log(reducer.EDIT_TITLE._)
+  // console:> EDIT_TITLE
+  console.log(reducer.EDIT_TITLE.type)
   // console:> EDIT_TITLE
   console.log(String(reducer.SAVE.FAIL))
   // console:> SAVE__FAIL

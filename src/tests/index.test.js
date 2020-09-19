@@ -177,18 +177,23 @@ describe('reduxMill', () => {
       reduxMill(initState, reducer, 'myName', { });
       expect(reducer.GET._).toBe('GET');
       expect(reducer.GET.LOAD._).toBe('GET_LOAD');
+      expect(reducer.GET.type).toBe('GET');
+      expect(reducer.GET.LOAD.type).toBe('GET_LOAD');
     });
 
     it('should contain action creators with custom divider in type', () => {
       reduxMill(initState, reducer, 'myName', { divider: '_x_' });
       expect(reducer.GET._).toBe('GET');
       expect(reducer.GET.LOAD._).toBe('GET_x_LOAD');
+      expect(reducer.GET.type).toBe('GET');
+      expect(reducer.GET.LOAD.type).toBe('GET_x_LOAD');
     });
 
     it('should contain action creators with string type', () => {
       reduxMill(initState, reducer, 'myName');
       const type = 'GET_LOAD';
       expect(reducer.GET.LOAD._).toBe(type);
+      expect(reducer.GET.LOAD.type).toBe(type);
       expect(reducer.GET.LOAD.toString()).toBe(type);
       expect(reducer.GET.LOAD.valueOf()).toBe(type);
     });

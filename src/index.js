@@ -120,6 +120,7 @@ export default function(initialState, rules, name, config = {}) {
       }
 
       rules[key]._ = type;
+      rules[key].type = type;
 
       rules[key].toString = function toString() {
         return type;
