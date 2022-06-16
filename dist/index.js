@@ -10,8 +10,9 @@ exports.default = _default;
 exports.defaultConfig = void 0;
 var defaultConfig = {
   debug: false,
-  divider: '_',
   stateDebug: false,
+  nameAsPrefix: false,
+  divider: '_',
   mainKey: 0
 };
 /**
@@ -72,6 +73,7 @@ function consoleDebugLog() {
  * @param {Object} config - additional options {
  *  debug: Bool, default is false,
  *  stateDebug: Bool, default is false,
+ *  nameAsPrefix: Bool, default is false,
  *  divider: String, default is '_',
  *  mainKey: String or Number, default is 0,
  *  reducerWrapper: Function(initState, Function(state, action)):Function(state, action),
@@ -94,7 +96,8 @@ function _default(initialState, rules, name, config) {
       stateDebug = _defaultConfig$config.stateDebug,
       mainKey = _defaultConfig$config.mainKey,
       reducerWrapper = _defaultConfig$config.reducerWrapper,
-      actionWrapper = _defaultConfig$config.actionWrapper;
+      actionWrapper = _defaultConfig$config.actionWrapper,
+      nameAsPrefix = _defaultConfig$config.nameAsPrefix;
 
   var debugLog = debug ? consoleDebugLog : function () {
     return null;
@@ -187,10 +190,11 @@ function _default(initialState, rules, name, config) {
 
 
   debugLog(name, config, initialState, rules);
-  var cases = getCases(rules, '');
+  var initPrefix = nameAsPrefix ? name : '';
+  var cases = getCases(rules, initPrefix);
   debugLog('Redux cases', cases);
-  transformToCreators(rules, '');
-  debugLog('Rules were transformated', rules);
+  transformToCreators(rules, initPrefix);
+  debugLog('Rules were transformed', rules);
 
   var reducer = function reducer(state, action) {
     if (state === void 0) {
