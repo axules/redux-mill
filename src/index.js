@@ -1,7 +1,8 @@
 export const defaultConfig = {
   debug: false,
-  divider: '_',
   stateDebug: false,
+  nameAsPrefix: false,
+  divider: '_',
   mainKey: 0
 };
 
@@ -50,6 +51,7 @@ export function consoleDebugLog(...args) {
  * @param {Object} config - additional options {
  *  debug: Bool, default is false,
  *  stateDebug: Bool, default is false,
+ *  nameAsPrefix: Bool, default is false,
  *  divider: String, default is '_',
  *  mainKey: String or Number, default is 0,
  *  reducerWrapper: Function(initState, Function(state, action)):Function(state, action),
@@ -59,7 +61,7 @@ export function consoleDebugLog(...args) {
  */
 export default function(initialState, rules, name, config = {}) {
   if (typeof rules !== 'object') throw new Error('Reducer should be Object');
-  const { debug, divider, stateDebug, mainKey, reducerWrapper, actionWrapper } = {
+  const { debug, divider, stateDebug, mainKey, reducerWrapper, actionWrapper, nameAsPrefix } = {
     ...defaultConfig,
     ...config
   };
@@ -81,7 +83,9 @@ export default function(initialState, rules, name, config = {}) {
   // returns all of cases for rules-reducer
   function getCases(rules, path = '') {
     checkAllowedType(rules);
+
     if (!rules) return {};
+
     if (isFunction(rules)) {
       return {
         [path]: prepareAction(rules)
@@ -135,10 +139,11 @@ export default function(initialState, rules, name, config = {}) {
   }
   // ----------------------------------------------------------
   debugLog(name, config, initialState, rules);
-  const cases = getCases(rules, '');
+  const initPrefix = nameAsPrefix ? name : '';
+  const cases = getCases(rules, initPrefix);
   debugLog('Redux cases', cases);
-  transformToCreators(rules, '');
-  debugLog('Rules were transformated', rules);
+  transformToCreators(rules, initPrefix);
+  debugLog('Rules were transformed', rules);
 
   const reducer = function(state = initialState, action = {}) {
     const { type, payload } = action;

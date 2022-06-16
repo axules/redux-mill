@@ -155,64 +155,73 @@ describe('reduxMill', () => {
       expect(typeof reducer.GET.LOAD).toBe('function');
     });
 
-    it('should contain action creators that can be converted to string', () => {
-      reduxMill(initState, reducer, 'myName', { });
-      expect(reducer.GET.toString()).toBe('GET');
-      expect(reducer.GET.LOAD.toString()).toBe('GET_LOAD');
-      expect(String(reducer.GET)).toBe('GET');
-      expect(String(reducer.GET.LOAD)).toBe('GET_LOAD');
-    });
+    describe.each([[false], [true]])('action codes when nameAsPrefix = %j', (nameAsPrefix) => {
+      const storeName = 'myName';
+      const prepare = (v, sep = '_') => [nameAsPrefix && storeName, v].filter(Boolean).join(sep);
 
-    it('should contain action creators that can be converted to value', () => {
-      reduxMill(initState, reducer, 'myName', { });
-      expect(reducer.GET.valueOf()).toBe('GET');
-      expect(reducer.GET.LOAD.valueOf()).toBe('GET_LOAD');
-      expect(reducer.GET + '!').toBe('GET!');
-      expect(reducer.GET.LOAD + '!').toBe('GET_LOAD!');
-      expect(reducer.GET == 'GET').toBeTruthy();
-      expect(reducer.GET.LOAD == 'GET_LOAD').toBeTruthy();
-    });
-
-    it('should contain action creators that has property `_` with action type string', () => {
-      reduxMill(initState, reducer, 'myName', { });
-      expect(reducer.GET._).toBe('GET');
-      expect(reducer.GET.LOAD._).toBe('GET_LOAD');
-      expect(reducer.GET.type).toBe('GET');
-      expect(reducer.GET.LOAD.type).toBe('GET_LOAD');
-    });
-
-    it('should contain action creators with custom divider in type', () => {
-      reduxMill(initState, reducer, 'myName', { divider: '_x_' });
-      expect(reducer.GET._).toBe('GET');
-      expect(reducer.GET.LOAD._).toBe('GET_x_LOAD');
-      expect(reducer.GET.type).toBe('GET');
-      expect(reducer.GET.LOAD.type).toBe('GET_x_LOAD');
-    });
-
-    it('should contain action creators with string type', () => {
-      reduxMill(initState, reducer, 'myName');
-      const type = 'GET_LOAD';
-      expect(reducer.GET.LOAD._).toBe(type);
-      expect(reducer.GET.LOAD.type).toBe(type);
-      expect(reducer.GET.LOAD.toString()).toBe(type);
-      expect(reducer.GET.LOAD.valueOf()).toBe(type);
-    });
-
-    it('> AC should return object with type and payload', () => {
-      reduxMill(initState, reducer, 'myName');
-      const payload = { a: 1, b: 2 };
-      expect(reducer.GET.LOAD(payload)).toEqual({
-        type: 'GET_LOAD',
-        payload,
+      it('should contain action creators that can be converted to string', () => {
+        reduxMill(initState, reducer, storeName, { nameAsPrefix });
+        expect(reducer.GET.toString()).toBe(prepare('GET'));
+        expect(reducer.GET.LOAD.toString()).toBe(prepare('GET_LOAD'));
+        expect(String(reducer.GET)).toBe(prepare('GET'));
+        expect('!' + reducer.GET).toBe('!' + prepare('GET'));
+        expect(`!${reducer.GET}`).toBe('!' + prepare('GET'));
+        expect(String(reducer.GET.LOAD)).toBe(prepare('GET_LOAD'));
       });
-    });
 
-    it('> AC should return object with type with custom divider', () => {
-      reduxMill(initState, reducer, 'myName', { divider: '---' });
-      const payload = { a: 1, b: 2 };
-      expect(reducer.GET.LOAD(payload)).toEqual({
-        type: 'GET---LOAD',
-        payload,
+      it('should contain action creators that can be converted to value', () => {
+        reduxMill(initState, reducer, storeName, { nameAsPrefix });
+        expect(reducer.GET.valueOf()).toBe(prepare('GET'));
+        expect(reducer.GET.LOAD.valueOf()).toBe(prepare('GET_LOAD'));
+        expect(reducer.GET + '!').toBe(prepare('GET!'));
+        expect(reducer.GET.LOAD + '!').toBe(prepare('GET_LOAD!'));
+        expect(reducer.GET == prepare('GET')).toBeTruthy();
+        expect(reducer.GET.LOAD == prepare('GET_LOAD')).toBeTruthy();
+      });
+
+      it('should contain action creators that has property `_` with action type string', () => {
+        reduxMill(initState, reducer, storeName, { nameAsPrefix });
+        expect(reducer.GET._).toBe(prepare('GET'));
+        expect(reducer.GET.LOAD._).toBe(prepare('GET_LOAD'));
+        expect(reducer.GET.type).toBe(prepare('GET'));
+        expect(reducer.GET.LOAD.type).toBe(prepare('GET_LOAD'));
+      });
+
+      it('should contain action creators with custom divider in type', () => {
+        reduxMill(initState, reducer, storeName, { divider: '_x_', nameAsPrefix });
+        expect(reducer.GET._).toBe(prepare('GET', '_x_'));
+        expect(reducer.GET.LOAD._).toBe(prepare('GET_x_LOAD', '_x_'));
+        expect(reducer.GET.type).toBe(prepare('GET', '_x_'));
+        expect(reducer.GET.LOAD.type).toBe(prepare('GET_x_LOAD', '_x_'));
+      });
+
+      it('should contain action creators with string type', () => {
+        reduxMill(initState, reducer, storeName, { nameAsPrefix });
+        const type = prepare('GET_LOAD');
+        expect(reducer.GET.LOAD._).toBe(type);
+        expect(reducer.GET.LOAD.type).toBe(type);
+        expect(reducer.GET.LOAD.toString()).toBe(type);
+        expect(reducer.GET.LOAD.valueOf()).toBe(type);
+        expect(`${reducer.GET.LOAD}`).toBe(type);
+        expect('' + reducer.GET.LOAD).toBe(type);
+      });
+
+      it('> AC should return object with type and payload', () => {
+        reduxMill(initState, reducer, storeName, { nameAsPrefix });
+        const payload = { a: 1, b: 2 };
+        expect(reducer.GET.LOAD(payload)).toEqual({
+          type: prepare('GET_LOAD'),
+          payload,
+        });
+      });
+
+      it('> AC should return object with type with custom divider', () => {
+        reduxMill(initState, reducer, storeName, { divider: '---', nameAsPrefix });
+        const payload = { a: 1, b: 2 };
+        expect(reducer.GET.LOAD(payload)).toEqual({
+          type: prepare('GET---LOAD', '---'),
+          payload,
+        });
       });
     });
   });

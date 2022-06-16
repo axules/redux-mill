@@ -63,6 +63,10 @@ It is easy to understand but there are some details.
     {
       // debug: true,
       // stateDebug: true,
+      // nameAsPrefix: false,
+      // if nameAsPrefix is true, then your action types will looks like -
+      // `{storeName}{divider}{actionType}` => `myStoreName__EDIT_TITLE`
+      // or `myStoreName__SAVE__FAIL` for children actions
       divider: "__",
       // it is divider between children and parent parts of key - SAVE__FAIL
       mainKey: 0
@@ -233,7 +237,8 @@ reduxMill(`initialState`, `reducer`, `storeName`, `options`): function(selector:
 | - | - | - | - |
 | `debug` | Boolean | false | enable debug console logging |
 | `stateDebug` | Boolean | false | enable debug state changes console logging |
-| `divider` | String | '_' | it is divider between parent key and children subkey |
+| `divider` | String | '_' | it is divider between parent key and children sub-key |
+| `nameAsPrefix` | Boolean | false | enable adding `storeName` as prefix for action types - {storeName}{divider}{actionType} |
 | `mainKey` | String | 0 | it is key for main handler for parent action name |
 | `reducerWrapper` | Function(initState, Function) |  | It is function wrapper for your reducer (e.g. immer) |
 | `actionWrapper` | Function(Function) |  | It is function wrapper for each action |
