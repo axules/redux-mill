@@ -56,25 +56,27 @@ export function consoleDebugLog(...args) {
  *  mainKey: String or Number, default is 0,
  *  reducerWrapper: Function(initState, Function(state, action)):Function(state, action),
  *  actionWrapper: Function(Function(state, payload, action)):Function(state, payload, action)
+ *  actionCreatorWrapper: Function(Function(payload)):Function(payload)
  * }
  * @returns {Object} - function(selector: function(store, ...args))
  */
 export default function(initialState, rules, name, config = {}) {
   if (typeof rules !== 'object') throw new Error('Reducer should be Object');
-  const { debug, divider, stateDebug, mainKey, reducerWrapper, actionWrapper, nameAsPrefix } = {
+  const { debug, divider, stateDebug, mainKey, reducerWrapper, actionWrapper, actionCreatorWrapper, nameAsPrefix } = {
     ...defaultConfig,
     ...config
   };
   const debugLog = debug ? consoleDebugLog : () => null;
   if (reducerWrapper && !isFunction(reducerWrapper)) throw new Error('reducerWrapper should be Function');
   if (actionWrapper && !isFunction(actionWrapper)) throw new Error('actionWrapper should be Function');
+  if (actionCreatorWrapper && !isFunction(actionCreatorWrapper)) throw new Error('actionCreatorWrapper should be Function');
 
   function prepareAction(action) {
     const wrapped = actionWrapper
       ? actionWrapper(action.bind(void 0))
       : action.bind(void 0);
     if (actionWrapper && !isFunction(wrapped)) {
-      throw new Error('actionWrapper should return Function(state, action)');
+      throw new Error('actionWrapper should return Function(state, payload, action)');
     }
     return wrapped;
   }
@@ -112,10 +114,17 @@ export default function(initialState, rules, name, config = {}) {
     Object.entries(rules).forEach(([key, value]) => {
       const type = makeType(prefix, divider, key);
 
-      rules[key] = function(payload) {
+      const actionCreator = function(payload) {
         debugLog(`[${type}] Action Creator`, key, type, payload);
         return { type, payload };
       };
+
+      rules[key] = actionCreatorWrapper
+        ? actionCreatorWrapper(actionCreator, type)
+        : actionCreator;
+      if (!isFunction(rules[key])) {
+        throw new Error('actionCreatorWrapper should return Function(payload):Object');
+      }
 
       if (!isFunction(value)) {
         delete value[mainKey];

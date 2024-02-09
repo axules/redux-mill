@@ -115,6 +115,7 @@ module.exports = {
 
   // Allows you to use a custom runner instead of Jest's default test runner
   // runner: "jest-runner",
+  // "runner": "jest-runner-eslint",
 
   // The paths to modules that run some code to configure or set up the testing environment before each test
   // setupFiles: [],
@@ -139,6 +140,9 @@ module.exports = {
   //   "**/__tests__/**/*.js?(x)",
   //   "**/?(*.)+(spec|test).js?(x)"
   // ],
+  'testMatch': [
+    '**/src/**/*.test.js'
+  ],
 
   // An array of regexp pattern strings that are matched against all test paths, matched tests are skipped
   // testPathIgnorePatterns: [

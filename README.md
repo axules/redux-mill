@@ -6,6 +6,7 @@
 4. [Using](#Using)
     - [config.reducerWrapper](#use-with-reducerWrapper)
     - [config.actionWrapper](#use-with-actionWrapper)
+    - [config.actionCreatorWrapper](#use-with-actionCreatorWrapper)
     - [As simple object](#reducer-is-simple-object)
     - [As instance of function](#reducer-is-instance-of-function)
     - [As instance of class](#reducer-is-instance-of-class)
@@ -14,6 +15,7 @@
     - [redux-mill](./src/tests/index.test.js)
     - [config.reducerWrapper](./src/tests/reducerWrapper.test.js)
     - [config.actionWrapper](./src/tests/actionWrapper.test.js)
+    - [config.actionCreatorWrapper](./src/tests/actionCreatorWrapper.test.js)
 
 
 ## What is it?
@@ -24,7 +26,7 @@ Main idea is possibility to use only one object to use actions, action creators 
 
 * You hate a lot of actions constants and very long imports of these constants
 * You hate a lot of equal action creators and very long imports
-* You want to use toor reducer path once in one place
+* You want to use reducer path once in one place
 
 ## Installation
 
@@ -242,6 +244,7 @@ reduxMill(`initialState`, `reducer`, `storeName`, `options`): function(selector:
 | `mainKey` | String | 0 | it is key for main handler for parent action name |
 | `reducerWrapper` | Function(initState, Function) |  | It is function wrapper for your reducer (e.g. immer) |
 | `actionWrapper` | Function(Function) |  | It is function wrapper for each action |
+| `actionCreatorWrapper` | Function(Function, actionType) |  | It is function wrapper for each action creator |
 
 #### It returns function that is factory of selectors for REDUX[storeName]
 
@@ -263,15 +266,15 @@ If you want to wrap your reducer, then you should use `reducerWrapper`. When we 
   import reduxMill from 'redux-mill';
 
   function wrapReducer(baseState, callback) {
-    // calback - it is reducer function(state, action), returns state
-    console.log('your reudcer was wrapped', baseState, callback);
+    // callback - it is reducer function(state, action), returns state
+    console.log('your reducer was wrapped', baseState, callback);
     return (state = baseState, action) => {
       console.log('reducer called with action: ', action);
       console.log('we will generate new state each time!');
-      // don't repeat this trick with JSON.parse(JSON.stringfy(...))
+      // don't repeat this trick with JSON.parse(JSON.stringify(...))
       // it will be applied for any result of reducer
       // and for current state if this reducer doesn't contain required action
-      return JSON.parse(JSON.stringfy(callback(state, action)));
+      return JSON.parse(JSON.stringify(callback(state, action)));
     }
   }
 
@@ -300,14 +303,14 @@ If you want to wrap each action handler separately then you should use `actionWr
   import reduxMill from 'redux-mill';
 
   function wrapAction(callback) {
-    // calback - it is action function(state, payload, action), returns state
+    // callback - it is action function(state, payload, action), returns state
     console.log('your action handler was wrapped', callback);
     return (state, payload, action) => {
       console.log('Action was called: ', action.type);
       console.log('we will generate new state');
-      // I don't recomend to use this trick with JSON.parse(JSON.stringfy(...))
+      // I don't recommend to use this trick with JSON.parse(JSON.stringify(...))
       // But you can, because it will be called only for actions, not for default
-      return JSON.parse(JSON.stringfy(callback(state, payload, action)));
+      return JSON.parse(JSON.stringify(callback(state, payload, action)));
     }
   }
 
@@ -333,6 +336,57 @@ If you want to wrap each action handler separately then you should use `actionWr
 ```
 
 [Test cases for `actionWrapper`](./src/tests/actionWrapper.test.js)
+
+
+### Use with `actionCreatorWrapper`
+If you want to wrap each action creator then you should use `actionCreatorWrapper`. Each action creator will be wrapped into `actionCreatorWrapper(actionCreator, actionType)`. We expect that `actionCreator` is Function(payload). `actionCreatorWrapper` should return `Function(...anyArgs)`.
+
+```javascript
+  import reduxMill from 'redux-mill';
+
+  function wrapActionCreator(baseActionCreator, actionType) {
+    // we may return `baseActionCreator` based on any condition, e.g. `actionType` comparison
+    if (actionType === 'setColor') return baseActionCreator;
+    // baseActionCreator - it is action creator function(payload), returns { type: String, payload: Any }
+    console.log('your action creator was wrapped', baseActionCreator);
+    return (payload, addTime = false) => {
+      const action = baseActionCreator(payload);
+      if (addTime) {
+        action.meta = { ...action.meta, currentTime: Date.now() };
+      }
+      console.log('Action creator was wrapped for: ', action.type);
+      return action;
+    }
+  }
+
+  const initialState = {
+    title: '',
+  }
+
+  const reducer = {
+    setTitle: (state, payload, action) => ({
+      ...state,
+      title: payload + ' ' + action.meta.currentTime
+    }),
+    setColor: (state, payload) => ({ ...state, color: payload })
+  }
+
+  const store = reduxMill(
+    initialState,
+    reducer,
+    'storeName',
+    { actionCreatorWrapper: wrapActionCreator }
+  );
+
+  // In this example `reducer` will look like:
+  // {
+  //   setTitle: wrapActionCreator((payload) => ({ type: 'setTitle', payload })),
+  //   setColor: (payload) => ({ type: 'setColor', payload })
+  // }
+```
+
+[Test cases for `actionCreatorWrapper`](./src/tests/actionCreatorWrapper.test.js)
+
 
 ## `reducer` is simple object
 
@@ -363,7 +417,7 @@ If you want to wrap each action handler separately then you should use `actionWr
         ({
           ...state,
           loading: false,
-          error: "Somthing is wrong with items =("
+          error: "Something is wrong with items =("
         })
     },
     ADD_ITEM: {
@@ -424,7 +478,7 @@ If you want to wrap each action handler separately then you should use `actionWr
         ({
           ...state,
           loading: false,
-          error: "Somthing is wrong with items =("
+          error: "Something is wrong with items =("
         })
     };
 
@@ -497,7 +551,7 @@ If you want to wrap each action handler separately then you should use `actionWr
       [FAIL]: state =>
         ({ ...state, {
           loading: false,
-          error: "Somthing is wrong with items =("
+          error: "Something is wrong with items =("
         })
     };
 
