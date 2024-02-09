@@ -8,7 +8,7 @@ exports.defaultConfig = void 0;
 exports.extendConfig = extendConfig;
 exports.isFunction = isFunction;
 exports.makeType = makeType;
-const defaultConfig = exports.defaultConfig = {
+var defaultConfig = exports.defaultConfig = {
   debug: false,
   stateDebug: false,
   nameAsPrefix: false,
@@ -27,25 +27,29 @@ function isFunction(value) {
   return typeof value === 'function';
 }
 function checkAllowedType(value) {
-  const TYPES = ['object', 'function'];
-  const type = typeof value;
-  if (!TYPES.some(el => el === type)) {
+  var TYPES = ['object', 'function'];
+  var type = typeof value;
+  if (!TYPES.some(function (el) {
+    return el === type;
+  })) {
     throw new Error('Value of redux rules should be one of types: ' + TYPES.join(', '));
   }
 }
 function makeType(prefix, divider, key) {
-  return `${prefix || ''}${prefix && key ? divider : ''}${key || ''}`;
+  return "" + (prefix || '') + (prefix && key ? divider : '') + (key || '');
 }
 function consoleDebugLog() {
   for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
     args[_key] = arguments[_key];
   }
-  const title = args.length > 1 && typeof args[0] === 'string' ? args.shift() : null;
+  var title = args.length > 1 && typeof args[0] === 'string' ? args.shift() : null;
   if (title) {
     // eslint-disable-next-line no-console
-    console.groupCollapsed(`MillDebug ::: ${title}`);
+    console.groupCollapsed("MillDebug ::: " + title);
   }
-  args.forEach(el => console.debug(el));
+  args.forEach(function (el) {
+    return console.debug(el);
+  });
   if (title) {
     // eslint-disable-next-line no-console
     console.groupEnd();
@@ -73,25 +77,23 @@ function _default(initialState, rules, name, config) {
     config = {};
   }
   if (typeof rules !== 'object') throw new Error('Reducer should be Object');
-  const {
-    debug,
-    divider,
-    stateDebug,
-    mainKey,
-    reducerWrapper,
-    actionWrapper,
-    actionCreatorWrapper,
-    nameAsPrefix
-  } = {
-    ...defaultConfig,
-    ...config
+  var _defaultConfig$config = Object.assign({}, defaultConfig, config),
+    debug = _defaultConfig$config.debug,
+    divider = _defaultConfig$config.divider,
+    stateDebug = _defaultConfig$config.stateDebug,
+    mainKey = _defaultConfig$config.mainKey,
+    reducerWrapper = _defaultConfig$config.reducerWrapper,
+    actionWrapper = _defaultConfig$config.actionWrapper,
+    actionCreatorWrapper = _defaultConfig$config.actionCreatorWrapper,
+    nameAsPrefix = _defaultConfig$config.nameAsPrefix;
+  var debugLog = debug ? consoleDebugLog : function () {
+    return null;
   };
-  const debugLog = debug ? consoleDebugLog : () => null;
   if (reducerWrapper && !isFunction(reducerWrapper)) throw new Error('reducerWrapper should be Function');
   if (actionWrapper && !isFunction(actionWrapper)) throw new Error('actionWrapper should be Function');
   if (actionCreatorWrapper && !isFunction(actionCreatorWrapper)) throw new Error('actionCreatorWrapper should be Function');
   function prepareAction(action) {
-    const wrapped = actionWrapper ? actionWrapper(action.bind(void 0)) : action.bind(void 0);
+    var wrapped = actionWrapper ? actionWrapper(action.bind(void 0)) : action.bind(void 0);
     if (actionWrapper && !isFunction(wrapped)) {
       throw new Error('actionWrapper should return Function(state, payload, action)');
     }
@@ -107,15 +109,15 @@ function _default(initialState, rules, name, config) {
     checkAllowedType(rules);
     if (!rules) return {};
     if (isFunction(rules)) {
-      return {
-        [path]: prepareAction(rules)
-      };
+      var _ref;
+      return _ref = {}, _ref[path] = prepareAction(rules), _ref;
     }
-    return Object.entries(rules).reduce((R, _ref) => {
-      let [key, value] = _ref;
+    return Object.entries(rules).reduce(function (R, _ref2) {
+      var key = _ref2[0],
+        value = _ref2[1];
       if (key == mainKey) {
         if (!isFunction(value)) {
-          throw new Error(`[${path}.${key}] should be function. Because it is [${path}] reducer's base handler`);
+          throw new Error("[" + path + "." + key + "] should be function. Because it is [" + path + "] reducer's base handler");
         }
         R[path] = prepareAction(value);
       } else {
@@ -130,14 +132,15 @@ function _default(initialState, rules, name, config) {
     if (prefix === void 0) {
       prefix = '';
     }
-    Object.entries(rules).forEach(_ref2 => {
-      let [key, value] = _ref2;
-      const type = makeType(prefix, divider, key);
-      const actionCreator = function (payload) {
-        debugLog(`[${type}] Action Creator`, key, type, payload);
+    Object.entries(rules).forEach(function (_ref3) {
+      var key = _ref3[0],
+        value = _ref3[1];
+      var type = makeType(prefix, divider, key);
+      var actionCreator = function actionCreator(payload) {
+        debugLog("[" + type + "] Action Creator", key, type, payload);
         return {
-          type,
-          payload
+          type: type,
+          payload: payload
         };
       };
       rules[key] = actionCreatorWrapper ? actionCreatorWrapper(actionCreator, type) : actionCreator;
@@ -162,28 +165,27 @@ function _default(initialState, rules, name, config) {
   }
   // ----------------------------------------------------------
   debugLog(name, config, initialState, rules);
-  const initPrefix = nameAsPrefix ? name : '';
-  const cases = getCases(rules, initPrefix);
+  var initPrefix = nameAsPrefix ? name : '';
+  var cases = getCases(rules, initPrefix);
   debugLog('Redux cases', cases);
   transformToCreators(rules, initPrefix);
   debugLog('Rules were transformed', rules);
-  const reducer = function (state, action) {
+  var reducer = function reducer(state, action) {
     if (state === void 0) {
       state = initialState;
     }
     if (action === void 0) {
       action = {};
     }
-    const {
-      type,
-      payload
-    } = action;
-    const handler = cases[type];
+    var _action = action,
+      type = _action.type,
+      payload = _action.payload;
+    var handler = cases[type];
     if (handler) {
-      debugLog(`[${type}] Handled`, action);
-      const newState = handler(state, payload, action);
+      debugLog("[" + type + "] Handled", action);
+      var newState = handler(state, payload, action);
       if (stateDebug) {
-        consoleDebugLog(`[${type}] State`, newState);
+        consoleDebugLog("[" + type + "] State", newState);
       }
       return newState;
     }
@@ -192,16 +194,16 @@ function _default(initialState, rules, name, config) {
   if (reducerWrapper) {
     debugLog('Reducer will be wrapped into reducerWrapper', cases);
   }
-  const wrappedReducer = reducerWrapper ? reducerWrapper(initialState, reducer) : reducer;
+  var wrappedReducer = reducerWrapper ? reducerWrapper(initialState, reducer) : reducer;
   if (!isFunction(wrappedReducer)) {
     throw new Error('reducerWrapper should return Function(state, action)');
   }
-  const customSelector = function (selector) {
+  var customSelector = function customSelector(selector) {
     return function (state) {
       for (var _len2 = arguments.length, args = new Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
         args[_key2 - 1] = arguments[_key2];
       }
-      return selector(state[name], ...args);
+      return selector.apply(void 0, [state[name]].concat(args));
     };
   };
   customSelector[name] = wrappedReducer;
